@@ -1,0 +1,56 @@
+#Yihan Zhu, 1003812403, albert.zhu@mail.utoronto.ca
+#Mufeng Wang, 1003804467, mufeng.wang@mail.utoronto.ca
+
+Sploit 1
+****************************************************************
+Vulnerability: buffer overflow - strcpy() without boundary check
+How: can copy unknown length string to a fixed-size buffer
+    exploit_str structure:
+        <-------buf------> <----rip---->
+        [shellcode + NOPs] [buf address]
+****************************************************************
+
+Sploit 2
+****************************************************************
+Vulnerability: buffer overflow - copy with boundary check larger than size (272 > 256)
+How: can modify boundary check and counter value
+    exploit_str structure:
+        <-------buf------> <len> <-i-> <----rip---->
+        [shellcode + NOPs] [283] [279] [buf address]
+****************************************************************
+
+Sploit 3
+****************************************************************
+Vulnerability: buffer overflow - copy with boundary check larger than size (88 > 64)
+How: can copy unknown length string to a fixed-size buffer
+    exploit_str structure:
+        <---------------------buf--------------------> <----rip---->
+        ["AAAA" preset dummy value + shellcode + NOPs] [buf address]
+****************************************************************
+
+Sploit 4
+****************************************************************
+Vulnerability: buffer overflow - copy with boundary check larger than size (169 > 156)
+How: can modify boundary check and counter value
+    exploit_str structure:
+        <-------buf------> <-i-> <len> <----rip---->
+        [shellcode + NOPs] [150] [169] [buf address]
+****************************************************************
+
+Sploit 5
+****************************************************************
+Vulnerability: format string - snprintf() %n can overwrite value
+How: can use %numberx%hhn to store little endian address for shellcode which is in buf.
+    exploit_str structure:
+        <-------rip-------> <--------buf-------->
+        [shellcode address] [fmt_str + shellcode]
+****************************************************************
+
+Sploit 6
+****************************************************************
+Vulnerability: double free - CHUNKs (tags) to direct tfree()
+How: can create fake CHUNKs to overwrite rip.
+    exploit_str structure:
+        <p_tag> <---------------buf----------------> <fake_tag_1_left> <-fake_tag_1_right-> <fake_tag_2_left> <----fake_tag_2_right---->
+                [jmp instruction + shellcode + NOPs] [-p_tag address-] [fake_tag_2 address] [--dummy value--] [rip address with freebit]
+****************************************************************
