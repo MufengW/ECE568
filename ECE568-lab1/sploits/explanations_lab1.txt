@@ -49,7 +49,7 @@ How: can use %numberx%hhn to store little endian address for shellcode which is 
 Sploit 6
 ****************************************************************
 Vulnerability: double free - CHUNKs (tags) to direct tfree()
-How: can create fake CHUNKs to overwrite rip.
+How: can create fake CHUNKs to overwrite rip so that when calling tfree(), rip will follow the tag_left to exec shellcode
     exploit_str structure:
         <p_tag> <---------------buf----------------> <fake_tag_1_left> <-fake_tag_1_right-> <fake_tag_2_left> <----fake_tag_2_right---->
                 [jmp instruction + shellcode + NOPs] [-p_tag address-] [fake_tag_2 address] [--dummy value--] [rip address with freebit]
