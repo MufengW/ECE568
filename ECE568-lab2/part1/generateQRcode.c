@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "lib/encoding.h"
+#include "lib/sha1.h"
 
 void to_hex(char *str, uint8_t *ret);
 
@@ -30,11 +31,11 @@ main(int argc, char * argv[])
     memset(otpauth, 0, 256);
     const char *issuer_encode = urlEncode(issuer);
     const char *accountName_encode = urlEncode(accountName);
-    uint8_t secret_hex_encode[17];
-    uint8_t secret_hex_arr[10];
-    memset(secret_hex_arr, 0, 10);
+    uint8_t secret_hex_encode[256];
+    uint8_t secret_hex_arr[SHA1_DIGEST_LENGTH / 2];
+    memset(secret_hex_arr, 0, SHA1_DIGEST_LENGTH / 2);
     to_hex(secret_hex, secret_hex_arr);
-    base32_encode(secret_hex_arr, 10,secret_hex_encode, 17);
+    base32_encode(secret_hex_arr, SHA1_DIGEST_LENGTH / 2, secret_hex_encode, 256);
     sprintf(otpauth, "otpauth://totp/%s?issuer=%s&secret=%s&period=30",
     accountName_encode, issuer_encode, secret_hex_encode);
     displayQRcode(otpauth);
