@@ -73,7 +73,7 @@ main(int argc, char * argv[])
     char *    TOTP_value = argv[2];
 
     assert (strlen(secret_hex) <= 20);
-    assert (strlen(TOTP_value) == 6);
+    assert (strlen(TOTP_value) == CODE_DIGITS);
 
     printf("\nSecret (Hex): %s\nTOTP Value: %s (%s)\n\n",
         secret_hex,
