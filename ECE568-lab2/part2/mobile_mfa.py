@@ -218,13 +218,47 @@ class BioConnect:
 	# ===== getAuthenticatorStatus: Mobile phone registration status
 
 	def getAuthenticatorStatus(self):
+		global	hostname
 
-		# >>> Add code here to call
-		#    .../v2/users/<userId>/authenicators/<authenticatorId>
-		# and process the response
+		url = "https://%s/v2/users/%s/authenticators/%s" \
+			% (hostname, self.userId, self.authenticatorId)
 
-		return('')
+		headers = {
+			'Content-Type':		'application/json',
+			'accept':		'application/json',
+			'bcaccesskey':		self.bcaccesskey,
+			'bcentitykey':		self.bcentitykey,
+			'bctoken':		self.bctoken
+		}
 
+		result = requests.get(url, headers=headers)
+
+		if result == False:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unable to get authenticator status")
+
+		try:
+			reply = json.loads(result.content.decode('utf-8'))
+
+		except ValueError:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unexpected reply for authenticator status")
+
+		statusString = reply.get("status","")
+		if statusString == "active":
+			faceStatusString = reply.get("face_status", "")
+			voiceStatusString = reply.get("voice_status", "")
+			fingerprintStatusString = reply.get("fingerprint_status", "")
+			eyeStatusString = reply.get("eye_status", "")
+			if faceStatusString == "enrolled" or \
+				voiceStatusString == "enrolled" or \
+				fingerprintStatusString == "enrolled" or \
+				eyeStatusString == "enrolled":
+				return "active"
+		else:
+			return "invalid"
 
 	# ===== sendStepup: Pushes an authentication request to the mobile app
 
@@ -232,11 +266,38 @@ class BioConnect:
 		transactionId = '%d' % int(time.time()),
 		message='Login request'):
 
-		# >>> Add code here to call
-		#     .../v2/user_verifications
-		# to push an authentication request to the mobile device
+		global hostname
+		url = 'https://%s/v2/user_verifications' % hostname
 
-		pass
+		headers = {
+			'Content-Type':		'application/json',
+			'accept':		'application/json',
+			'bcaccesskey':		self.bcaccesskey,
+			'bcentitykey':		self.bcentitykey,
+			'bctoken':		self.bctoken
+		}
+
+		data = {
+			'user_uuid':		self.userId,
+			'transaction_id':	transactionId,
+			'message': 			message
+		}
+		result = requests.post(url, data=json.dumps(data), headers=headers)
+
+		if result == False:
+			# Error: we did not receive an HTTP/200
+			print(headers)
+			print(json.dumps(data))
+			print(result.content)
+			sys.exit("Error: unable to send stepup")
+
+		try:
+			reply = json.loads(result.content.decode('utf-8'))
+			self.verificationId = reply.get("user_verification","").get("uuid","")
+
+		except ValueError:
+			self.verificationId = ""
+
 
 	# ===== getStepupStatus: Fetches the status of the user auth request
 
@@ -245,8 +306,32 @@ class BioConnect:
 		# >>> Add code here to call
 		#     .../v2/user_verifications/<verificationId>
 		# to poll for the current status of the verification
+		global hostname
+		url = 'https://%s/v2/user_verifications/%s' % (hostname, self.verificationId)
+		headers = {
+			'Content-Type':		'application/json',
+			'accept':		'application/json',
+			'bcaccesskey':		self.bcaccesskey,
+			'bcentitykey':		self.bcentitykey,
+			'bctoken':		self.bctoken
+		}
+		result = requests.get(url, headers = headers)
 
-		return('declined')
+		if result == False:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unable to get step up state")
+
+		try:
+			reply = json.loads(result.content.decode('utf-8'))
+
+		except ValueError:
+			print(headers)
+			print(result.content)
+			sys.exit("Error: unable to get step up state")
+
+		statusString = reply.get("user_verification","").get("status","")
+		return statusString
 
 
 	# ===== deleteUser: Deletes the user and mobile phone entries
@@ -326,9 +411,9 @@ for i in range(120):
 
 	status = session.getAuthenticatorStatus()
 
-	if session.getAuthenticatorStatus() == "active":
+	if status == "active":
 		break
-	time.sleep(1)
+	time.sleep(5)
 
 if status != "active":
 	del session
@@ -347,7 +432,7 @@ for i in range(3):
 
 		status = session.getStepupStatus()
 		while status == "pending":
-			time.sleep(1)
+			time.sleep(5)
 			status = session.getStepupStatus()
 
 	else:
