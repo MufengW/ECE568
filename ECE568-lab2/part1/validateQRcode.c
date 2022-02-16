@@ -119,4 +119,6 @@ void gen_result(uint8_t *sha, char *result) {
     char *fmt_str;
     sprintf(fmt_str, "%%%dd", CODE_DIGITS);
     sprintf(result, fmt_str, otp);
+    for(int i = 0; i < CODE_DIGITS; ++i)
+        if(result[i] == ' ') result[i] = '0';
 }
