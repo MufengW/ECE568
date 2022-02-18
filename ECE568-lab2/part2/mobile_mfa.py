@@ -206,7 +206,7 @@ class BioConnect:
 			print(headers)
 			print(result.content)
 			sys.exit("Error: unexpected reply for QR code")
-	
+
 		# Extract the activation URL for this mobile phone
 		activationString = reply.get("activation_string","")
 

@@ -37,7 +37,7 @@ main(int argc, char * argv[])
     to_hex(secret_hex, secret_hex_arr);
     base32_encode(secret_hex_arr, SHA1_DIGEST_LENGTH / 2, secret_hex_encode, 256);
     sprintf(otpauth, "otpauth://totp/%s?issuer=%s&secret=%s&period=30",
-    accountName_encode, issuer_encode, secret_hex_encode);
+        accountName_encode, issuer_encode, secret_hex_encode);
     displayQRcode(otpauth);
 
     return (0);

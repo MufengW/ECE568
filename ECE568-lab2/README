@@ -1,0 +1,35 @@
+#Yihan Zhu, 1003812403, albert.zhu@mail.utoronto.ca
+#Mufeng Wang, 1003804467, mufeng.wang@mail.utoronto.ca
+
+Generate QR code
+****************************************************************
+1. change the user input [secret] to hex
+2. encode the secret in hex using base32_encode
+3. output the otpauth and QR code with the encoded secret
+****************************************************************
+
+Validate QR code
+****************************************************************
+1. use the HMAC-SHA1 generation
+    a. XOR calculation with key & inner pad
+    b. XOR calculation with key & outer pad
+    c. combine the output from step a with message to produce hash sum 1
+    d. combine the output from step b with hash sum 1 to produce the final hash
+    e. produce result of 6 digits TOTP value
+2. compare the result from step 1 to the user input
+3. show valid or invalid result
+****************************************************************
+
+MFA
+****************************************************************
+1. authenticator status
+    a. use the url and headers to GET the JSON structure
+    b. verify that at least one of the biometric modalities is enrolled
+    c. return correct status
+2. push a request
+    a. use the url and headers to POST the JSON structure
+    b. store the uuid from the user_verification in the JSON structure
+3. check if the user responds to the request
+    a. use the url and headers to GET the JSON structure
+    b. store the status from the user_verification in the JSON structure
+****************************************************************
